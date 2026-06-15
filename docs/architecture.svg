@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="920" viewBox="0 0 820 920" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif" role="img">
+<title>YouTube trending analytics: AWS data lake architecture</title>
+<defs>
+<marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+<path d="M2 1 L8 5 L2 9" fill="none" stroke="#444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+<marker id="ard" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+<path d="M2 1 L8 5 L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+<style>
+.t { font-size: 22px; font-weight: 600; fill: #2A2924; }
+.s { font-size: 12.5px; fill: #6A6862; }
+.mn { font-size: 17px; font-weight: 600; fill: #2A2924; }
+.ml { font-size: 9.5px; fill: #6A6862; letter-spacing: 1.2px; }
+.lb { font-size: 13px; font-weight: 500; }
+.sl { font-size: 10.5px; }
+.al { font-size: 9.5px; fill: #555; }
+.ad { font-size: 9.5px; fill: #888; }
+.cl { font-size: 11px; font-weight: 600; fill: #6A6862; letter-spacing: 1.5px; }
+.ft { font-size: 10px; fill: #999; }
+.ht { font-size: 10.5px; font-weight: 600; fill: #6A6862; letter-spacing: 1.5px; }
+.hb { font-size: 11px; fill: #2A2924; }
+.aws { fill: #FFF4E5; stroke: #C26A1F; }
+.aws-t { fill: #5C2F0E; }
+.aws-s { fill: #8E4B1E; }
+.src { fill: #F0EDE3; stroke: #76746B; }
+.src-t { fill: #2A2924; }
+.src-s { fill: #6A6862; }
+.viz { fill: #DCEAF3; stroke: #1F77A1; }
+.viz-t { fill: #0F3D54; }
+.viz-s { fill: #1F5C7E; }
+.bz { fill: #F5E6D2; stroke: #B07840; }
+.bz-t { fill: #5C3A1A; }
+.bz-s { fill: #855A2A; }
+.sv { fill: #ECECEC; stroke: #888888; }
+.sv-t { fill: #333333; }
+.sv-s { fill: #5C5C5C; }
+.gd { fill: #FAEFC8; stroke: #B8941F; }
+.gd-t { fill: #5C4A0F; }
+.gd-s { fill: #8A6F1F; }
+.lake { fill: none; stroke: #C5C2B7; stroke-dasharray: 4 3; }
+.pn { fill: #FBFAF6; stroke: #DCD9CD; }
+.arr { stroke: #444; stroke-width: 1.5; fill: none; }
+.arrd { stroke: #888; stroke-width: 1.3; fill: none; stroke-dasharray: 5 3; }
+.arrdt { stroke: #999; stroke-width: 1.1; fill: none; stroke-dasharray: 2 3; }
+rect { stroke-width: 1; }
+</style>
+</defs>
+<rect width="820" height="920" fill="#FAFAF6"/>
+
+<text class="t" x="410" y="40" text-anchor="middle">YouTube Trending Analytics</text>
+<text class="s" x="410" y="62" text-anchor="middle">End-to-end data lake on AWS, medallion architecture</text>
+
+<text class="mn" x="220" y="92" text-anchor="middle">3</text>
+<text class="ml" x="220" y="108" text-anchor="middle">COUNTRIES IN SCOPE</text>
+<text class="mn" x="350" y="92" text-anchor="middle">2,416</text>
+<text class="ml" x="350" y="108" text-anchor="middle">VIDEOS ANALYZED</text>
+<text class="mn" x="480" y="92" text-anchor="middle">~50 KB</text>
+<text class="ml" x="480" y="108" text-anchor="middle">PER QUERY</text>
+<text class="mn" x="600" y="92" text-anchor="middle">&lt; $1</text>
+<text class="ml" x="600" y="108" text-anchor="middle">PER MONTH</text>
+<line x1="180" y1="120" x2="640" y2="120" stroke="#E5E2D6" stroke-width="1"/>
+
+<rect class="pn" x="40" y="140" width="180" height="160" rx="8"/>
+<text class="ht" x="56" y="160">DESIGN HIGHLIGHTS</text>
+<text class="hb" x="56" y="184">• Parquet + partition pruning</text>
+<text class="hb" x="62" y="200">drops scans to ~50 KB / query</text>
+<text class="hb" x="56" y="222">• Lambda transforms category</text>
+<text class="hb" x="62" y="238">JSON on S3 PUT events</text>
+<text class="hb" x="56" y="260">• Single Glue PySpark job</text>
+<text class="hb" x="62" y="276">joins all loaded regions</text>
+
+<rect class="src" x="310" y="140" width="200" height="56" rx="6"/>
+<text class="lb src-t" x="410" y="162" text-anchor="middle">Kaggle dataset</text>
+<text class="sl src-s" x="410" y="180" text-anchor="middle">YouTube trending: CSV + JSON</text>
+
+<line x1="410" y1="196" x2="410" y2="252" class="arr" marker-end="url(#ar)"/>
+<text class="al" x="416" y="228">bulk upload (aws s3 cp)</text>
+
+<rect class="lake" x="250" y="222" width="340" height="410" rx="10"/>
+<text class="cl" x="265" y="243">S3 DATA LAKE: MEDALLION</text>
+
+<rect class="bz" x="275" y="255" width="290" height="78" rx="6"/>
+<text class="lb bz-t" x="289" y="277">S3 Raw zone (bronze)</text>
+<text class="sl bz-s" x="289" y="297">s3://…-youtube-raw-useast1-dev/</text>
+<text class="sl bz-s" x="289" y="313">Country CSVs · category JSONs</text>
+<text class="sl bz-s" x="289" y="327">Untouched, original encoding</text>
+
+<rect class="sv" x="275" y="388" width="290" height="78" rx="6"/>
+<text class="lb sv-t" x="289" y="410">S3 Cleansed zone (silver)</text>
+<text class="sl sv-s" x="289" y="430">s3://…-youtube-cleansed-useast1-dev/</text>
+<text class="sl sv-s" x="289" y="446">Parquet · Snappy · typed schema</text>
+<text class="sl sv-s" x="289" y="460">Partitioned by region</text>
+
+<rect class="gd" x="275" y="521" width="290" height="78" rx="6"/>
+<text class="lb gd-t" x="289" y="543">S3 Analytics zone (gold)</text>
+<text class="sl gd-s" x="289" y="563">s3://…-youtube-analytics-useast1-dev/</text>
+<text class="sl gd-s" x="289" y="579">final_analytics: videos × categories</text>
+<text class="sl gd-s" x="289" y="593">Partitioned by region + category_id</text>
+
+<rect class="aws" x="625" y="340" width="160" height="40" rx="6"/>
+<text class="lb aws-t" x="705" y="358" text-anchor="middle">AWS Lambda</text>
+<text class="sl aws-s" x="705" y="372" text-anchor="middle">transform_categories.py</text>
+
+<line x1="565" y1="340" x2="625" y2="350" class="arr" marker-end="url(#ar)"/>
+<text class="al" x="572" y="334">S3 PUT trigger</text>
+
+<line x1="625" y1="375" x2="565" y2="388" class="arr" marker-end="url(#ar)"/>
+<text class="al" x="572" y="397">writes Parquet</text>
+
+<rect class="aws" x="625" y="408" width="160" height="36" rx="6"/>
+<text class="lb aws-t" x="705" y="423" text-anchor="middle">EventBridge</text>
+<text class="sl aws-s" x="705" y="437" text-anchor="middle">cron(0 6 * * ? *), daily</text>
+
+<line x1="705" y1="444" x2="705" y2="472" class="arrd" marker-end="url(#ard)"/>
+<text class="ad" x="710" y="460">schedules</text>
+
+<rect class="aws" x="625" y="472" width="160" height="40" rx="6"/>
+<text class="lb aws-t" x="705" y="490" text-anchor="middle">Glue ETL (PySpark)</text>
+<text class="sl aws-s" x="705" y="504" text-anchor="middle">joining_job.py</text>
+
+<line x1="565" y1="466" x2="625" y2="478" class="arr" marker-end="url(#ar)"/>
+<text class="al" x="572" y="461">reads silver</text>
+
+<line x1="625" y1="508" x2="565" y2="521" class="arr" marker-end="url(#ar)"/>
+<text class="al" x="572" y="528">joins → writes gold</text>
+
+<rect class="aws" x="160" y="670" width="180" height="56" rx="6"/>
+<text class="lb aws-t" x="250" y="692" text-anchor="middle">Glue Data Catalog</text>
+<text class="sl aws-s" x="250" y="710" text-anchor="middle">de_youtube_analytics db</text>
+
+<rect class="aws" x="420" y="670" width="180" height="56" rx="6"/>
+<text class="lb aws-t" x="510" y="692" text-anchor="middle">Amazon Athena</text>
+<text class="sl aws-s" x="510" y="710" text-anchor="middle">analytical SQL · sql/*.sql</text>
+
+<line x1="340" y1="698" x2="420" y2="698" class="arrdt"/>
+<text class="ad" x="345" y="694">schema / metadata</text>
+
+<path class="arrdt" d="M310 599 Q260 635 250 670"/>
+<text class="ad" x="180" y="652">Glue Crawler</text>
+<text class="ad" x="180" y="666">updates schema</text>
+
+<line x1="510" y1="599" x2="510" y2="670" class="arr" marker-end="url(#ar)"/>
+<text class="al" x="516" y="640">scans Parquet</text>
+
+<rect class="viz" x="420" y="790" width="180" height="56" rx="6"/>
+<text class="lb viz-t" x="510" y="812" text-anchor="middle">Tableau Public</text>
+<text class="sl viz-s" x="510" y="830" text-anchor="middle">Multi-country dashboard</text>
+
+<line x1="510" y1="726" x2="510" y2="790" class="arr" marker-end="url(#ar)"/>
+<text class="al" x="516" y="762">CSV export</text>
+
+<text class="ft" x="410" y="888" text-anchor="middle">Built by Olivia Cai · S3 · Lambda · Glue PySpark · Athena · Tableau Public · 2026</text>
+</svg>
